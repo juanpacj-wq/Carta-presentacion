@@ -1,0 +1,52 @@
+[Unit]
+Description=COMUNICACIONES API (Express + SQLite)
+Documentation=https://github.com/gecelca/comunicaciones
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=comunicaciones
+Group=comunicaciones
+WorkingDirectory=/opt/comunicaciones
+
+# Secrets live in /etc/comunicaciones/env (chmod 600, owned by root:comunicaciones).
+# Keeping them outside the repo directory means a `git pull` cannot clobber them.
+EnvironmentFile=/etc/comunicaciones/env
+
+ExecStart=/usr/bin/node server/dist/index.js
+
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+
+# Forward SIGTERM to Node so its graceful shutdown runs (closes HTTP server + SQLite handle).
+KillSignal=SIGTERM
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+# Node needs W^X off because of JIT.
+
+# Only these paths are writable by the service.
+# /var/lib/comunicaciones holds the SQLite database file (+ WAL/SHM sidecars).
+ReadWritePaths=/opt/comunicaciones/server/uploads /var/lib/comunicaciones
+
+# Reasonable file descriptor limit for a Node process handling uploads.
+LimitNOFILE=65535
+
+# Log to journald as structured JSON (the app already emits JSON to stdout).
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=comunicaciones
+
+[Install]
+WantedBy=multi-user.target

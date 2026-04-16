@@ -1,0 +1,18 @@
+{
+  "name": "comunicaciones",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client-admin",
+    "client-public"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=client-admin\" \"npm run dev --workspace=client-public\"",
+    "build": "npm run build --workspace=client-admin && npm run build --workspace=client-public && npm run build --workspace=server",
+    "start": "npm start --workspace=server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
