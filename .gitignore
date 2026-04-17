@@ -12,7 +12,7 @@ server/data/
 !.env.example
 *.log
 servidor.md
-DEPLOY.md
+.gitignore
 
 scripts_a_correr.sql
 CLAUDE.md
