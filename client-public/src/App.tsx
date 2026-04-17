@@ -1,9 +1,14 @@
+import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ProfileCard from './pages/ProfileCard';
 
 function NotFound() {
+  useEffect(() => {
+    document.title = 'Pagina no encontrada - GECELCA';
+  }, []);
+
   return (
-    <div style={{
+    <main style={{
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -14,10 +19,15 @@ function NotFound() {
       textAlign: 'center',
       padding: '24px',
     }}>
-      <div>
-        <p style={{ fontSize: '1.1rem', opacity: 0.9 }}>Perfil no encontrado</p>
+      <div role="alert" aria-live="assertive">
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '8px' }}>
+          Pagina no encontrada
+        </h1>
+        <p style={{ fontSize: '1rem' }}>
+          El perfil solicitado no existe o fue removido.
+        </p>
       </div>
-    </div>
+    </main>
   );
 }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchProfile, ProfileResponse } from '../api/profiles';
 
@@ -9,6 +9,9 @@ export default function ProfileCard() {
   const [error, setError] = useState('');
   const [showQR, setShowQR] = useState(false);
 
+  const qrTriggerRef = useRef<HTMLButtonElement>(null);
+  const qrCloseBtnRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     if (!id) return;
     fetchProfile(id)
@@ -16,6 +19,31 @@ export default function ProfileCard() {
       .catch(() => setError('Perfil no encontrado'))
       .finally(() => setLoading(false));
   }, [id]);
+
+  // Titulo dinamico (WCAG 2.4.2)
+  useEffect(() => {
+    if (profile) {
+      document.title = `${profile.name} - ${profile.position} - GECELCA`;
+    } else if (error) {
+      document.title = 'Perfil no encontrado - GECELCA';
+    } else {
+      document.title = 'Cargando perfil - GECELCA';
+    }
+  }, [profile, error]);
+
+  // Manejo de foco y tecla Escape para el modal QR (WCAG 2.1.1, 2.1.2, 2.4.3)
+  useEffect(() => {
+    if (!showQR) return;
+    qrCloseBtnRef.current?.focus();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowQR(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      qrTriggerRef.current?.focus();
+    };
+  }, [showQR]);
 
   function generateVCard(p: ProfileResponse) {
     const vcard = [
@@ -41,22 +69,23 @@ export default function ProfileCard() {
 
   if (loading) {
     return (
-      <div style={styles.loadingScreen}>
-        <div style={styles.spinner} />
+      <div style={styles.loadingScreen} role="status" aria-live="polite" aria-busy="true">
+        <div style={styles.spinner} aria-hidden="true" />
+        <span className="sr-only">Cargando perfil</span>
       </div>
     );
   }
 
   if (error || !profile) {
     return (
-      <div style={styles.loadingScreen}>
-        <p style={{ color: '#dc2626', fontSize: '1rem' }}>{error || 'Perfil no encontrado'}</p>
+      <div style={styles.loadingScreen} role="alert" aria-live="assertive">
+        <p style={{ color: '#ffffff', fontSize: '1rem' }}>{error || 'Perfil no encontrado'}</p>
       </div>
     );
   }
 
   return (
-    <div style={styles.page}>
+    <main style={styles.page}>
       {/* Geometric background shapes */}
       <div style={styles.bgShape1} />
       <div style={styles.bgShape2} />
@@ -69,7 +98,7 @@ export default function ProfileCard() {
         <div style={styles.heroCard}>
           <img
             src={profile.photoUrl}
-            alt={profile.name}
+            alt={`imagen ${profile.name}`}
             style={styles.heroPhoto}
           />
           {/* Gradient overlay */}
@@ -80,20 +109,20 @@ export default function ProfileCard() {
             <p style={styles.heroPosition}>{profile.position}</p>
             <img
               src="/assets/gecelca-blanco.png"
-              alt="GECELCA"
+              alt="Logo de GECELCA"
               style={styles.heroLogo}
             />
             {/* Action buttons */}
             <div style={styles.actionRow}>
               {profile.phone && (
-                <a href={`tel:${profile.phone}`} style={styles.actionBtn} aria-label="Llamar">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <a href={`tel:${profile.phone}`} style={styles.actionBtn} aria-label={`Llamar a ${profile.name}`}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                   </svg>
                 </a>
               )}
-              <a href={`mailto:${profile.email}`} style={styles.actionBtn} aria-label="Enviar correo">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <a href={`mailto:${profile.email}`} style={styles.actionBtn} aria-label={`Enviar correo a ${profile.name}`}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
                   <rect width="20" height="16" x="2" y="4" rx="2" />
                   <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                 </svg>
@@ -105,7 +134,7 @@ export default function ProfileCard() {
         {/* Contact info section */}
         <div style={styles.infoCard}>
           <div style={styles.infoHeader}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#023f86" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#023f86" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
               <path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2" />
               <rect width="18" height="18" x="3" y="4" rx="2" />
               <circle cx="12" cy="10" r="2" />
@@ -136,13 +165,14 @@ export default function ProfileCard() {
             target="_blank"
             rel="noopener noreferrer"
             style={styles.webLink}
+            aria-label="Abrir sitio web de GECELCA en una nueva pestana"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#023f86" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#023f86" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
             </svg>
             <span>GECELCA</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto' }} aria-hidden="true" focusable="false">
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </a>
@@ -153,11 +183,14 @@ export default function ProfileCard() {
       {/* Floating buttons */}
       <div style={styles.floatingLeft}>
         <button
+          ref={qrTriggerRef}
           onClick={() => setShowQR(true)}
           style={styles.floatingBtn}
-          aria-label="Mostrar QR"
+          aria-label="Mostrar codigo QR del perfil"
+          aria-haspopup="dialog"
+          aria-expanded={showQR}
         >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
             <rect x="2" y="2" width="8" height="8" rx="1" />
             <rect x="14" y="2" width="8" height="8" rx="1" />
             <rect x="2" y="14" width="8" height="8" rx="1" />
@@ -176,9 +209,9 @@ export default function ProfileCard() {
             }
           }}
           style={styles.floatingBtn}
-          aria-label="Compartir"
+          aria-label="Compartir enlace del perfil"
         >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
             <circle cx="18" cy="5" r="3" />
             <circle cx="6" cy="12" r="3" />
             <circle cx="18" cy="19" r="3" />
@@ -191,9 +224,9 @@ export default function ProfileCard() {
       <button
         onClick={() => generateVCard(profile)}
         style={styles.floatingRight}
-        aria-label="Guardar contacto"
+        aria-label={`Guardar contacto de ${profile.name}`}
       >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
           <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
           <circle cx="9" cy="7" r="4" />
           <line x1="19" x2="19" y1="8" y2="14" />
@@ -204,19 +237,35 @@ export default function ProfileCard() {
 
       {/* QR Modal */}
       {showQR && (
-        <div style={styles.qrOverlay} onClick={() => setShowQR(false)}>
-          <div style={styles.qrModal} onClick={(e) => e.stopPropagation()}>
-            <button style={styles.qrCloseBtn} onClick={() => setShowQR(false)}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div
+          style={styles.qrOverlay}
+          onClick={() => setShowQR(false)}
+          aria-hidden="true"
+        >
+          <div
+            style={styles.qrModal}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="qr-dialog-title"
+          >
+            <button
+              ref={qrCloseBtnRef}
+              style={styles.qrCloseBtn}
+              onClick={() => setShowQR(false)}
+              aria-label="Cerrar"
+              type="button"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
-            <h3 style={styles.qrTitle}>{profile.name}</h3>
+            <h2 id="qr-dialog-title" style={styles.qrTitle}>{profile.name}</h2>
             <div style={styles.qrImageWrap}>
               <img
                 src={`/api/profiles/${id}/qr`}
-                alt={`QR de ${profile.name}`}
+                alt={`Codigo QR del perfil de ${profile.name}`}
                 width={200}
                 height={200}
                 style={{ borderRadius: '12px' }}
@@ -225,7 +274,7 @@ export default function ProfileCard() {
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 }
 
@@ -310,7 +359,8 @@ const styles: Record<string, React.CSSProperties> = {
   heroOverlay: {
     position: 'absolute',
     inset: 0,
-    background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 35%, transparent 65%)',
+    // Zona de texto (0-45%) totalmente opaca para garantizar contraste AA medible.
+    background: 'linear-gradient(to top, #000000 0%, #000000 45%, rgba(0,0,0,0.6) 60%, transparent 80%)',
   },
   heroContent: {
     position: 'absolute',
@@ -325,13 +375,15 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#ffffff',
     lineHeight: 1.2,
     marginBottom: '4px',
+    textShadow: '0 1px 3px rgba(0,0,0,0.6)',
   },
   heroPosition: {
     fontSize: '0.9rem',
-    color: 'rgba(255,255,255,0.85)',
-    fontWeight: 400,
+    color: '#ffffff',
+    fontWeight: 500,
     marginBottom: '16px',
     lineHeight: 1.4,
+    textShadow: '0 1px 2px rgba(0,0,0,0.5)',
   },
   heroLogo: {
     height: '60px',
