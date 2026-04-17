@@ -6,7 +6,7 @@ Guía de instalación de COMUNICACIONES en un servidor Ubuntu 22.04/24.04 usando
 
 - Ubuntu 22.04 o 24.04 con acceso `sudo`
 - Dominio apuntando al servidor (p.ej. `comunicaciones.example.com`)
-- La base de datos es **SQLite** y vive como un archivo en el mismo servidor (`/var/lib/comunicaciones/comunicaciones.db`). No se requiere acceso a ningún servidor de base de datos externo.
+- La base de datos es **SQLite** y vive como un archivo en el mismo servidor (`/var/lib/comunicaciones/comunicaciones.db`). No se requiere acceso a ningún servidor de base de datos externo por la simpleza del modelo.
 
 ## 2. Instalar dependencias del sistema
 
