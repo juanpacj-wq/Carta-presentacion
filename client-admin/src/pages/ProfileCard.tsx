@@ -80,7 +80,7 @@ export default function ProfileCard() {
             <h1 style={styles.heroName}>{profile.name}</h1>
             <p style={styles.heroPosition}>{profile.position}</p>
             <img
-              src="/assets/gecelca-blanco.png"
+              src={`${import.meta.env.BASE_URL}assets/gecelca-blanco.png`}
               alt="GECELCA"
               style={styles.heroLogo}
             />

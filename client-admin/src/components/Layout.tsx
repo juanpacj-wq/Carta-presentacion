@@ -24,7 +24,7 @@ export default function Layout() {
         zIndex: 50,
       }}>
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '14px', textDecoration: 'none' }}>
-          <img src="/assets/gecelca-blanco.png" alt="GECELCA" style={{ height: '34px', width: 'auto' }} />
+          <img src={`${import.meta.env.BASE_URL}assets/gecelca-blanco.png`} alt="GECELCA" style={{ height: '34px', width: 'auto' }} />
           <div style={{
             width: '1px',
             height: '24px',
