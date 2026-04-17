@@ -26,3 +26,37 @@ Thumbs.db
 # Test artifacts
 coverage/
 .vitest/
+
+cambios_de_seguridad.md
+cambios de seguridad.md
+
+# TypeScript incremental build
+*.tsbuildinfo
+
+# Certificados y llaves (Let's Encrypt, SSH, etc.)
+*.pem
+*.key
+*.crt
+*.cert
+*.pfx
+*.p12
+
+# Backups y temporales
+*.bak
+*.backup
+*.orig
+*.rej
+*~
+tmp/
+temp/
+.cache/
+
+# Package manager caches
+.npm/
+.yarn/
+.pnp.*
+
+# Archivos locales de tooling
+.claude/
+.cursor/
+.aider*
