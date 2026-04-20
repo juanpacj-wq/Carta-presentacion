@@ -30,8 +30,11 @@ jobs:
       - name: Test server
         run: npm test --workspace=server
 
-      - name: Build client
-        run: npm run build --workspace=client
+      - name: Build client-admin
+        run: npm run build --workspace=client-admin
+
+      - name: Build client-public
+        run: npm run build --workspace=client-public
 
       - name: Build server
         run: npm run build --workspace=server
