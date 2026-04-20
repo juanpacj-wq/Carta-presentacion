@@ -29,6 +29,7 @@ coverage/
 
 cambios_de_seguridad.md
 cambios de seguridad.md
+DESPLIEGUE_SSH.md
 
 # TypeScript incremental build
 *.tsbuildinfo
