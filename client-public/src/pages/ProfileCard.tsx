@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchProfile, ProfileResponse } from '../api/profiles';
+import QRCodeBranded from '../components/QRCodeBranded';
 
 export default function ProfileCard() {
   const { id } = useParams<{ id: string }>();
@@ -262,14 +263,12 @@ export default function ProfileCard() {
               </svg>
             </button>
             <h2 id="qr-dialog-title" style={styles.qrTitle}>{profile.name}</h2>
-            <div style={styles.qrImageWrap}>
-              <img
-                src={`/api/profiles/${id}/qr`}
-                alt={`Codigo QR del perfil de ${profile.name}`}
-                width={200}
-                height={200}
-                style={{ borderRadius: '12px' }}
-              />
+            <div
+              style={styles.qrImageWrap}
+              role="img"
+              aria-label={`Codigo QR del perfil de ${profile.name}`}
+            >
+              <QRCodeBranded profileId={id!} size={200} />
             </div>
           </div>
         </div>
